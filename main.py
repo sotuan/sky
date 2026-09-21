@@ -1,159 +1,268 @@
-import healpy as hp
 import numpy as np
 
-from Sky_Model import (
+from config import (
+    KERNEL_DIR,
+    START_DATE,
+    STOP_DATE,
+    TIME_STEP_DAYS,
+    WORK_NSIDE,
+    ANTENNA_ORIENTATIONS,
+)
+
+from lft3_specs import make_bands
+
+from sky_model import (
     create_gsm,
-    generate_sky_map,
+    generate_sky_map_with_hf_extrapolation,
+    generate_hf_reference_map,
     print_sky_diagnostics,
 )
 
-from Galactic_to_ICRF import (
+from galactic_to_ICRF import (
     get_icrs_pixel_vectors,
 )
 
-from beam import (
-    gaussian_beam,
-    beam_averaged_temperature,
+from lunar_geometry import (
+    load_spice_kernels,
+    make_rotation_matrices,
+    make_antenna_directions,
+    make_zenith_directions,
 )
 
-from Boresight_Dir import zenith_j2000
-
-
-# ============================================================
-# Configuration
-# ============================================================
-
-FREQUENCY_MHZ = 250.0
-
-FWHM_DEG = 60.0
-
-WORK_NSIDE = 128
-
-UTC = "2029-10-29T12:00:00"
-
-
-# ============================================================
-# 1. Load GSM2016
-# ============================================================
-
-print("\nLoading GSM2016...")
-
-gsm = create_gsm()
-
-
-# ============================================================
-# 2. Generate sky temperature map
-# ============================================================
-
-print()
-print(
-    f"Generating sky at {FREQUENCY_MHZ} MHz..."
+from sensitivity import (
+    calculate_sensitivity,
 )
 
-sky = generate_sky_map(
-    gsm,
-    frequency_mhz=FREQUENCY_MHZ,
-    work_nside=WORK_NSIDE,
+from plot_sensitivity import (
+    plot_all_sensitivity_ranges,
 )
 
-print_sky_diagnostics(sky)
+import spiceypy as spice
 
 
-# ============================================================
-# 3. Generate fixed celestial vectors for HEALPix pixels
-# ============================================================
+def make_times():
 
-nside = hp.get_nside(sky)
+    start = np.datetime64(
+        START_DATE
+    )
 
-sky_vectors = get_icrs_pixel_vectors(
-    nside
-)
+    stop = np.datetime64(
+        STOP_DATE
+    )
 
-print()
-print(
-    "Sky-vector array shape:",
-    sky_vectors.shape
-)
+    step = np.timedelta64(
+        TIME_STEP_DAYS,
+        "D"
+    )
 
+    times = np.arange(
+        start,
+        stop,
+        step
+    )
 
-# ============================================================
-# 4. Obtain lunar local zenith from your SPICE code
-# ============================================================
-
-b_j2000 = zenith_j2000(UTC)
-
-b_j2000 = np.asarray(
-    b_j2000,
-    dtype=np.float64
-)
-
-b_j2000 /= np.linalg.norm(b_j2000)
-
-print()
-print("Observation UTC:")
-print(UTC)
-
-print()
-print("LFT3 local zenith in J2000:")
-print(b_j2000)
-
-print(
-    "Boresight norm:",
-    np.linalg.norm(b_j2000)
-)
+    return np.array([
+        np.datetime_as_string(
+            t,
+            unit="s"
+        )
+        for t in times
+    ])
 
 
-# ============================================================
-# 5. Gaussian beam
-# ============================================================
+def main():
 
-beam, cos_angle = gaussian_beam(
-    sky_vectors=sky_vectors,
-    boresight=b_j2000,
-    fwhm_deg=FWHM_DEG,
-    apply_lunar_horizon=True,
-)
+    # ========================================================
+    # 1. Times
+    # ========================================================
+
+    times = make_times()
+
+    print(
+        f"Number of times: {len(times)}"
+    )
+
+    print(
+        "First:",
+        times[0]
+    )
+
+    print(
+        "Last:",
+        times[-1]
+    )
 
 
-# ============================================================
-# 6. Beam-averaged sky temperature
-# ============================================================
+    # ========================================================
+    # 2. SPICE
+    # ========================================================
 
-T_beam = beam_averaged_temperature(
-    sky_temperature=sky,
-    beam=beam,
-)
+    load_spice_kernels(
+        KERNEL_DIR
+    )
+
+    rotations = (
+        make_rotation_matrices(
+            times
+        )
+    )
+
+    zenith_j2000 = (
+        make_zenith_directions(
+            rotations
+        )
+    )
 
 
-# ============================================================
-# 7. Results
-# ============================================================
+    # ========================================================
+    # 3. HEALPix sky directions
+    # ========================================================
 
-visible_pixels = np.sum(
-    cos_angle > 0
-)
+    sky_vectors_icrs = (
+        get_icrs_pixel_vectors(
+            WORK_NSIDE
+        )
+    )
 
-print()
-print("============================")
-print("RESULT")
-print("============================")
 
-print(
-    f"Observation UTC: {UTC}"
-)
+    # ========================================================
+    # 4. PyGDSM
+    # ========================================================
 
-print(
-    f"Frequency:       {FREQUENCY_MHZ:.1f} MHz"
-)
+    gsm = create_gsm()
+    
+    sky_11mhz = generate_hf_reference_map(
+        gsm,
+        WORK_NSIDE,
+    )
 
-print(
-    f"Gaussian FWHM:   {FWHM_DEG:.1f} deg"
-)
 
-print(
-    f"Visible pixels:  {visible_pixels:,}"
-)
+    # ========================================================
+    # 5. LFT3 bands
+    # ========================================================
 
-print(
-    f"Beam temperature: {T_beam:.3f} K"
-)
+    bands = make_bands()
+
+    results = {}
+
+
+    # ========================================================
+    # 6. Each band
+    # ========================================================
+
+    for band_name, band in bands.items():
+
+        print()
+        print("========================")
+        print(band_name)
+        print("========================")
+
+        orientation = (
+            ANTENNA_ORIENTATIONS[
+                band_name
+            ]
+        )
+
+        # ----------------------------------------------------
+        # Antenna/formed-beam direction
+        # ----------------------------------------------------
+
+        antenna_j2000 = (
+            make_antenna_directions(
+                orientation["az_deg"],
+                orientation["el_deg"],
+                rotations,
+            )
+        )
+
+        # ----------------------------------------------------
+        # Generate GSM maps at every frequency
+        # ----------------------------------------------------
+
+        sky_maps = []
+
+        for freq in band.freqs_mhz:
+
+            print(
+                f"Generating sky: "
+                f"{freq:.1f} MHz"
+            )
+
+            sky = generate_sky_map_with_hf_extrapolation(
+                gsm,
+                freq,
+                WORK_NSIDE,
+                sky_11mhz,
+            )
+
+            sky_maps.append(sky)
+
+        # ----------------------------------------------------
+        # Calculate sensitivity
+        # ----------------------------------------------------
+
+        print(
+            f"Finished generating {band_name} sky maps."
+        )
+
+        print(
+            f"Starting {band_name} sensitivity calculation..."
+        )
+
+        result = calculate_sensitivity(
+            band=band,
+            frequencies_mhz=band.freqs_mhz,
+            sky_maps=sky_maps,
+            sky_vectors_icrs=sky_vectors_icrs,
+            antenna_j2000=antenna_j2000,
+            zenith_j2000=zenith_j2000,
+        )
+
+        results[band_name] = result
+
+        # ----------------------------------------------------
+        # Save results
+        # ----------------------------------------------------
+
+        np.savez_compressed(
+            f"{band_name}_sensitivity.npz",
+            times_utc=times,
+            freqs_mhz=band.freqs_mhz,
+            Tsky_K=result["Tsky_K"],
+            Tsys_K=result["Tsys_K"],
+            Aeff_m2=result["Aeff_m2"],
+            Ae_Tsys_m2_per_K=
+                result["Ae_Tsys_m2_per_K"],
+            SEFD_Jy=result["SEFD_Jy"],
+        )
+
+        print()
+        print(
+            f"{band_name}: saved."
+        )
+    
+    
+    # ========================================================
+    # 7. Generate sensitivity plots
+    # ========================================================
+
+    plot_all_sensitivity_ranges(
+        results=results,
+        bands=bands,
+        show_plot=False,
+    )
+
+
+    # ========================================================
+    # 8. Clean up SPICE
+    # ========================================================
+
+
+    spice.kclear()
+
+    return results
+
+
+if __name__ == "__main__":
+
+    results = main()
