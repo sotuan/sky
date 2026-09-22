@@ -42,11 +42,7 @@ The azimuth/elevation convention is:
 - elevation = 0 deg: local horizon;
 - elevation = 90 deg: local zenith.
 
-A local direction is converted to a Moon-fixed Cartesian vector using
-
-$$\hat{d} = \cos e \cos A \hat{N} + \cos e \sin A \hat{E} + \sin e \hat{Z}.$$
-
-SPICE is then used to rotate the fixed lunar frame direction into J2000 at every observing time.
+A local direction is converted to a Moon-fixed Cartesian vector, and SPICE is then used to rotate the fixed lunar frame direction into J2000 at every observing time.
 
 The relevant SPICE kernels are:
 
