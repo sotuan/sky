@@ -45,9 +45,7 @@ The azimuth/elevation convention is:
 A local direction is converted to a Moon-fixed Cartesian vector using
 
 $$
-\hat{d}
-=
-\cos e\cos A\,\hat{N}
+\hat{d} = \cos e\cos A\,\hat{N}
 +
 \cos e\sin A\,\hat{E}
 +
