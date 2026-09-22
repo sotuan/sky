@@ -44,13 +44,7 @@ The azimuth/elevation convention is:
 
 A local direction is converted to a Moon-fixed Cartesian vector using
 
-$$
-\hat{d} = \cos e\cos A\,\hat{N}
-+
-\cos e\sin A\,\hat{E}
-+
-\sin e\,\hat{Z}.
-$$
+$$\hat{d} = \cos e \cos A \hat{N} + \cos e \sin A \hat{E} + \sin e \hat{Z}.$$
 
 SPICE is then used to rotate the fixed lunar frame direction into J2000 at every observing time.
 
