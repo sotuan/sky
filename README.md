@@ -124,7 +124,7 @@ $$
 For HEALPix,
 
 $$
-N_{\rm pix}=12\, \mathrm{NSIDE}^2.
+N_{\rm pix}=12\cdot \mathrm{NSIDE}^2.
 $$
 
 Examples:
