@@ -10,14 +10,17 @@ The calculation uses the preliminary LFT3 beam models across HF, VHF and UHF ban
 ## 0. Main formulae
 
 For every observing time $t$ and frequency $\nu$ within a certain band, the program evaluates the beam-weighted sky temperature
+
 $$
 T_{\rm sky}(t,\nu)=
 \frac{\int B(\hat{s},t,\nu)T_{\rm env}(\hat{s},\nu)d\Omega}
 {\int B(\hat{s},t,\nu)d\Omega} ,
 $$
+
 where  $B(\hat{s},t,\nu)$ is the beam function that depends on the pointing parameterized by $\hat{s}$.
 
 The environment temperature is currently modeled as
+
 $$
 T_{\rm env}=
 \begin{cases}
@@ -27,14 +30,19 @@ T_{\rm GSM}, & \text{above the lunar horizon},\
 $$
 
 The system temperature is obtained by adding the receiver temperature
+
 $$
 T_{\rm sys}(t,\nu)=T_{\rm sky}(t,\nu)+T_{\rm rcvr}(\nu) ,
 $$
+
 from which one obtains the sensitivity measures:
+
 $$
 \frac{A_{\rm eff}}{T_{\rm sys}}
 $$
+
 and
+
 $$
 {\rm SEFD}=
 \frac{2k_B (T_{\rm sys}/ \text{K})}{A_{\rm eff}/\text{m}^2}10^{26}\ {\rm Jy}.
@@ -143,7 +151,7 @@ The current setup uses:
 - PCHIP interpolation;
 - CMB included.
 
-For frequencies at or below 10 MHz, the code extrapolates from 11 MHz with spectral index -2.7:
+For frequencies below 11 MHz, the code extrapolates with spectral index -2.7:
 
 $$
 T(\nu)=T(11\,\mathrm{MHz})
