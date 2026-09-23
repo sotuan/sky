@@ -24,7 +24,7 @@ The environment temperature is currently modeled as
 $$
 T_{\rm env}=
 \begin{cases}
-T_{\rm GSM}, & \text{above the lunar horizon},\
+T_{\rm GSM}, & \text{above the lunar horizon},\\
 0, & \text{otherwise}.
 \end{cases}
 $$
@@ -45,7 +45,7 @@ and
 
 $$
 {\rm SEFD}=
-\frac{2k_B (T_{\rm sys}/ \text{K})}{A_{\rm eff}/\text{m}^2}10^{26}\ {\rm Jy}.
+\frac{2k_B (T_{\rm sys}/ \text{K})}{A_{\rm eff}/\text{m}^2}10^{26}\ {\text{Jy}}.
 $$
 
 ## 1. Assumed LFT3 specifications
