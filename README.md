@@ -2,10 +2,43 @@
 
 This project calculates the expected sky contribution to the LFT3 system temperature and derives two sensitivity measures as functions of frequency and time:
 
-- effective area over system temperature, $A_{\rm eff}/T_{\rm sys}$, in $\text{m}^2$/K;
+- effective area over system temperature, in $\text{m}^2$/K;
 - system equivalent flux density (SEFD), in Jy.
 
-The calculation uses the preliminary LFT3 beam models across HF, VHF and UHF bands, the GSM2016 sky temperature maps obtained with PyGDSM, and the lunar reference frame imported from SPICE.
+The calculation uses the preliminary LFT3 beam models across HF, VHF and UHF bands, the GSM2016 sky temperature $T_{\rm GSM}$ maps obtained with PyGDSM, and the lunar reference frame imported from SPICE.
+
+## 0. Main formulae
+
+For every observing time $t$ and frequency $\nu$ within a certain band, the program evaluates the beam-weighted sky temperature
+$$
+T_{\rm sky}(t,\nu)=
+\frac{\int B(\hat{s},t,\nu)T_{\rm env}(\hat{s},\nu)d\Omega}
+{\int B(\hat{s},t,\nu)d\Omega} ,
+$$
+where  $B(\hat{s},t,\nu)$ is the beam function that depends on the pointing parameterized by $\hat{s}$.
+
+The environment temperature is currently modeled as
+$$
+T_{\rm env}=
+\begin{cases}
+T_{\rm GSM}, & \text{above the lunar horizon},\
+0, & \text{otherwise}.
+\end{cases}
+$$
+
+The system temperature is obtained by adding the receiver temperature
+$$
+T_{\rm sys}(t,\nu)=T_{\rm sky}(t,\nu)+T_{\rm rcvr}(\nu) ,
+$$
+from which one obtains the sensitivity measures:
+$$
+\frac{A_{\rm eff}}{T_{\rm sys}}
+$$
+and
+$$
+{\rm SEFD}=
+\frac{2k_B (T_{\rm sys}/ \text{K})}{A_{\rm eff}/\text{m}^2}10^{26}\ {\rm Jy}.
+$$
 
 ## 1. Assumed LFT3 specifications
 
@@ -257,7 +290,7 @@ SkyT/
 ```
 
 ### `config.py`
-Site, time, NSIDE, antenna orientation, kernel, and model settings.
+Specifies LFT3 site (lon, lat), observation times, resolution of the sky maps (NSIDE), and antenna orientations (azimuth, elevation for each band).
 
 ### `lft3_specs.py`
 Frequency grids and simplified instrument parameters for the five bands.
@@ -275,10 +308,10 @@ Local lunar coordinates and SPICE frame transformations.
 HF, VHF, and UHF beam models.
 
 ### `sensitivity.py`
-Beam-weighted sky temperature, system temperature, effective area, $A_{\rm eff}/T_{\rm sys}$, and SEFD.
+Calculates beam-weighted sky temperature, system temperature, effective area, $A_{\rm eff}/T_{\rm sys}$, and SEFD.
 
 ### `plot_sensitivity.py`
-Plot min-max sensitivity envelopes over the full observing interval.
+Plots min-max sensitivity envelopes over the full observing interval.
 
 ### `main.py`
 Runs the full scientific pipeline.
@@ -305,7 +338,7 @@ Current assumptions include:
 1. The Moon is locally spherical (horizon masks exactly half of the sky).
 2. The lunar surface is assumed to have zero radio brightness temperature.
 3. Antenna orientations are fixed local azimuth/elevation values.
-4. GSM2016 represents the diffuse radio sky, while the sky at <=10 MHz is extrapolated from 11 MHz with spectral index -2.7.
+4. GSM2016 represents the diffuse radio sky, while the sky at < 11 MHz is extrapolated from 11 MHz with spectral index -2.7.
 5. HF/VHF use idealized dipole patterns.
 6. UHF uses an Airy-like effective formed beam rather than a full phased-array electromagnetic model.
 7. Solar radio emission is not included.
