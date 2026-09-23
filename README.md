@@ -154,8 +154,8 @@ The current setup uses:
 For frequencies below 11 MHz, the code extrapolates with spectral index -2.7:
 
 $$
-T(\nu)=T(11\,\mathrm{MHz})
-\left(\frac{\nu}{11\,\mathrm{MHz}}\right)^{-2.7}.
+T(\nu)=T(11 \mathrm{MHz})
+\left(\frac{\nu}{11 \mathrm{MHz}}\right)^{-2.7}.
 $$
 
 ## 7. ICRS-coordinates of sky map pixels
