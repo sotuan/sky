@@ -66,7 +66,7 @@ The default calculation uses one sample per day over the half-year interval:
 
 - start: `2028-07-01T00:00:00`
 - stop: `2029-01-01T00:00:00`
-- cadence: 1 day
+- step: 1 day
 
 The observing-time settings are in `config.py`.
 
@@ -91,7 +91,7 @@ The relevant SPICE kernels are:
 - `moon_pa_de440_200625.bpc`
 - `moon_de440_250416.tf`
 
-They are stored in `kernels/` unless `config.py` specifies another location.
+They are stored in `SPICE_kernels/` unless `config.py` specifies another location.
 
 ## 4. Antenna orientations
 
@@ -284,7 +284,7 @@ SkyT/
 |-- plot_sensitivity.py
 |-- replot.py
 |
-|-- kernels/
+|-- SPICE_kernels/
 |   |-- naif0012.tls
 |   |-- moon_pa_de440_200625.bpc
 |   `-- moon_de440_250416.tf
