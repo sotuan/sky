@@ -13,7 +13,7 @@ For every observing time $t$ and frequency $\nu$ within a certain band, the prog
 
 $$
 T_{\rm sky}(t,\nu)=
-\frac{\int B(\hat{s},t,\nu)T_{\rm env}(\hat{s},\nu)d\Omega}
+\frac{\int B(\hat{s},t,\nu)T_{\rm env}(\hat{s},t,\nu)d\Omega}
 {\int B(\hat{s},t,\nu)d\Omega} ,
 $$
 
