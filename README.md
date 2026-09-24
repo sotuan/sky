@@ -17,7 +17,7 @@ T_{\rm sky}(t,\nu)=
 {\int B(\hat{s},t,\nu)d\Omega} ,
 $$
 
-where  $B(\hat{s},t,\nu)$ is the beam function that depends on the pointing parameterized by $\hat{s}$.
+where  $B(\hat{s},t,\nu)$ is the beam function that depends on the antenna orientations/beam pointing.
 
 The environment temperature is currently modeled as
 
