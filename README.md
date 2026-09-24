@@ -24,7 +24,7 @@ The environment temperature is currently modeled as
 $$
 T_{\rm env}=
 \begin{cases}
-T_{\rm GSM}, & \text{above the lunar horizon},\\
+T_{\rm GSM}, & \text{above the lunar horizon at time $t$},\\
 0, & \text{otherwise}.
 \end{cases}
 $$
