@@ -53,10 +53,8 @@ $$
 | Band | Frequency range | Step | Elements | Directivity | Receiver temperature | Beam model |
 |---|---:|---:|---:|---:|---:|---|
 | HF | 1-50 MHz | 1 MHz | 1 | 1.6 | 300 K | frequency-dependent dipole |
-| VHF-LO | 60-110 MHz | 1 MHz | 1 | 1.6 | 100 K | half-wave dipole |
-| VHF-HI | 150-250 MHz | 1 MHz | 1 | 1.6 | 100 K | half-wave dipole |
-| UHF-LO | 300-900 MHz | 2 MHz | 48 | 3.1 | 30 K | Airy-like formed beam |
-| UHF-HI | 900-2700 MHz | 10 MHz | 8 | 3.1 | 35 K | Airy-like formed beam |
+| VHF | 60-250 MHz | 1 MHz | 1 | 1.6 | 100 K | half-wave dipole |
+| UHF | 300-2700 MHz | 2 MHz | 48 | 3.1 | 30 K | Airy-like formed beam |
 
 The band definitions are in `lft3_specs.py`.
 
@@ -111,7 +109,7 @@ HF uses the simplified frequency-dependent dipole model.
 
 ### VHF
 
-VHF-LO and VHF-HI use the same half-wave-dipole power pattern,
+VHF uses the half-wave-dipole power pattern,
 
 $$
 B(\theta)=
@@ -125,7 +123,7 @@ where $\theta$ is measured from the dipole axis.
 
 ### UHF
 
-The UHF bands use a simplified effective Airy-like formed beam model,
+The UHF band uses a simplified effective Airy-like formed beam model,
 
 $$
 B(\alpha)=
@@ -213,10 +211,8 @@ For each band it:
 
 ```text
 HF_sensitivity.npz
-VHF_LO_sensitivity.npz
-VHF_HI_sensitivity.npz
-UHF_LO_sensitivity.npz
-UHF_HI_sensitivity.npz
+VHF_sensitivity.npz
+UHF_sensitivity.npz
 ```
 
 Each file contains:
