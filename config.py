@@ -5,7 +5,7 @@ from pathlib import Path
 # Path to SPICE kernels
 # ============================================================
 
-KERNEL_DIR = Path(Path.home() / "Documents" / "LFT3" / "SkyT" / "SPICE_kernels")
+KERNEL_DIR = Path(Path.home() / "Documents" / "LFT3" / "sky" / "SPICE_kernels")
 
 
 # ============================================================
@@ -56,33 +56,16 @@ ANTENNA_ORIENTATIONS = {
         "el_deg": 0.0,
     },
 
-    "VHF_LO": {
+    "VHF": {
         "az_deg": 0.0,
         "el_deg": 0.0,
     },
 
-    "VHF_HI": {
-        "az_deg": 0.0,
-        "el_deg": 0.0,
-    },
-
-    "UHF_LO": {
-        "az_deg": 0.0,
-        "el_deg": 90.0,
-    },
-
-    "UHF_HI": {
+    "UHF": {
         "az_deg": 0.0,
         "el_deg": 90.0,
     },
 }
-
-
-# ============================================================
-# UHF_HI beam option
-# ============================================================
-
-STRICT_LFT3SOFT_UHF_HI = False
 
 
 # ============================================================
