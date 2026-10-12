@@ -32,6 +32,8 @@ TIME_STEP_DAYS = 1
 # GSM2016 low-resolution map is NSIDE=64.
 WORK_NSIDE = 64
 
+# Choose low-frequency (below 10 MHz) sky model ("ulsa" or "powerlaw")
+LOW_FREQ_SKY_MODEL = "ulsa"
 
 # ============================================================
 # Antenna orientations

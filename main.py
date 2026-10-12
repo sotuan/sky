@@ -7,13 +7,15 @@ from config import (
     TIME_STEP_DAYS,
     WORK_NSIDE,
     ANTENNA_ORIENTATIONS,
+    LOW_FREQ_SKY_MODEL,
 )
 
 from lft3_specs import make_bands
 
 from sky_model import (
+    generate_sky_map,
+    generate_sky_map_combined,
     create_gsm,
-    generate_sky_map_with_hf_extrapolation,
     generate_hf_reference_map,
     print_sky_diagnostics,
 )
@@ -131,10 +133,28 @@ def main():
 
     gsm = create_gsm()
     
-    sky_11mhz = generate_hf_reference_map(
-        gsm,
-        WORK_NSIDE,
+    gsm_reference_10mhz = None
+    sky_11mhz = None
+
+    if LOW_FREQ_SKY_MODEL == "ulsa":
+
+        gsm_reference_10mhz = generate_sky_map(
+            gsm,
+            10.0,
+            WORK_NSIDE,
     )
+
+    elif LOW_FREQ_SKY_MODEL == "powerlaw":
+
+        sky_11mhz = generate_hf_reference_map(
+            gsm,
+            WORK_NSIDE,
+        )
+
+    else:
+        raise ValueError(
+            f"Unknown sky model: {LOW_FREQ_SKY_MODEL}"
+        )
 
 
     # ========================================================
@@ -144,6 +164,13 @@ def main():
     bands = make_bands()
 
     results = {}
+    
+    # Identify the sky model in output filenames
+    output_suffix = (
+       "_ulsa"
+       if LOW_FREQ_SKY_MODEL == "ulsa"
+       else ""
+    )
 
 
     # ========================================================
@@ -188,13 +215,15 @@ def main():
                 f"{freq:.1f} MHz"
             )
 
-            sky = generate_sky_map_with_hf_extrapolation(
+            sky = generate_sky_map_combined(
                 gsm,
                 freq,
                 WORK_NSIDE,
-                sky_11mhz,
+                sky_model=LOW_FREQ_SKY_MODEL,
+                gsm_reference_10mhz=gsm_reference_10mhz,
+                reference_map_11mhz=sky_11mhz,
             )
-
+            
             sky_maps.append(sky)
 
         # ----------------------------------------------------
@@ -225,7 +254,7 @@ def main():
         # ----------------------------------------------------
 
         np.savez_compressed(
-            f"{band_name}_sensitivity.npz",
+            f"{band_name}_sensitivity{output_suffix}.npz",
             times_utc=times,
             freqs_mhz=band.freqs_mhz,
             Tsky_K=result["Tsky_K"],
@@ -250,6 +279,7 @@ def main():
         results=results,
         bands=bands,
         show_plot=False,
+        output_suffix=output_suffix,
     )
 
 

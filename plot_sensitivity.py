@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 def plot_sefd_ranges(
     results,
     bands,
-    output_file="SEFD_sensitivity_range.png",
+    output_file,
     show_plot=False,
 ):
     """
@@ -139,7 +139,7 @@ def plot_sefd_ranges(
 def plot_ae_tsys_ranges(
     results,
     bands,
-    output_file="Ae_Tsys_sensitivity_range.png",
+    output_file,
     show_plot=False,
 ):
     """
@@ -271,6 +271,7 @@ def plot_all_sensitivity_ranges(
     results,
     bands,
     show_plot=False,
+    output_suffix="",
 ):
     """
     Function that creates both sensitivity plots.
@@ -279,13 +280,13 @@ def plot_all_sensitivity_ranges(
     plot_sefd_ranges(
         results=results,
         bands=bands,
-        output_file="SEFD_sensitivity_range.png",
+        output_file=f"SEFD_sensitivity_range{output_suffix}.png",
         show_plot=show_plot,
     )
 
     plot_ae_tsys_ranges(
         results=results,
         bands=bands,
-        output_file="Ae_Tsys_sensitivity_range.png",
+        output_file=f"Ae_Tsys_sensitivity_range{output_suffix}.png",
         show_plot=show_plot,
     )

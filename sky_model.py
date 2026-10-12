@@ -3,6 +3,74 @@ import healpy as hp
 
 from pygdsm import GlobalSkyModel16
 
+from ulsa_sky import get_ulsa_sky
+
+
+def generate_sky_map_combined(
+    gsm,
+    frequency_mhz,
+    nside,
+    sky_model,
+    gsm_reference_10mhz=None,
+    reference_map_11mhz=None,
+):
+    """
+    Generate a sky map using GSM16 and optionally ULSA.
+
+    sky_model:
+        "ulsa":
+            ULSA below 10 MHz, normalized to GSM16
+            at 10 MHz. GSM16 at >= 10 MHz.
+
+        "powerlaw":
+            Original -2.7 extrapolation below
+            10 MHz. GSM16 at >= 10 MHz.
+    """
+
+    freq = float(frequency_mhz)
+
+    # GSM16 for frequencies >= 10 MHz
+    if freq >= 10.0:
+        return generate_sky_map(
+            gsm,
+            freq,
+            nside,
+        )
+
+    # Original power-law extrapolation
+    if sky_model == "powerlaw":
+
+        if reference_map_11mhz is None:
+            raise ValueError(
+                "11-MHz reference map required"
+            )
+
+        return generate_sky_map_with_hf_extrapolation(
+            gsm,
+            freq,
+            nside,
+            reference_map_11mhz,
+        )
+
+    # New absorption-aware ULSA model
+    if sky_model == "ulsa":
+
+        if gsm_reference_10mhz is None:
+            raise ValueError(
+                "10-MHz GSM16 reference map required"
+            )
+
+        return get_ulsa_sky(
+            freq,
+            gsm_reference_10mhz,
+            nside=nside,
+            normalize_to_gsm=True,
+        )
+
+    raise ValueError(
+        f"Unknown sky model: {sky_model}"
+    )
+
 
 def create_gsm():
 
