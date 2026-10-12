@@ -140,7 +140,7 @@ where $\alpha$ is angular separation from the formed-beam boresight, and $D$ is 
 
 ## 6. Sky model
 
-### 4.1 GSM2016 at 10 MHz and above
+### 6.1 GSM2016 at 10 MHz and above
 
 `sky_model.py` creates `pygdsm.GlobalSkyModel16` with the settings:
 
@@ -156,7 +156,7 @@ GlobalSkyModel16(
 
 The generated map is converted to the working HEALPix `NSIDE` when necessary. Sky temperatures are in Rayleigh–Jeans Kelvin. The maps and derived sky vectors are interpreted in Galactic HEALPix RING ordering.
 
-### 4.2 ULSA maps from 1 to 10 MHz
+### 6.2 ULSA maps from 1 to 10 MHz
 
 The [Ultra-long Wavelength Sky Model with Absorption (ULSA)](https://github.com/Yanping-Cong/ULSA), described by [Cong et al. (2021)](https://arxiv.org/abs/2104.03170), is used to model the low-frequency spectral and spatial effects of Galactic free–free absorption. This improves on extrapolating to lower frequencies via a single synchrotron power law.
 
@@ -190,7 +190,7 @@ absorption_JRZ(
 
 Here `constant_index` refers to the model's intrinsic synchrotron spectral-index option. ULSA map generation requires its external code, observational input maps (including Haslam 408 MHz), and the NE2001 Galactic electron-density calculation.
 
-### 4.3 Matching ULSA to GSM2016 at 10 MHz
+### 6.3 Matching ULSA to GSM2016 at 10 MHz
 
 The default hybrid model is selected by setting
 
@@ -198,7 +198,7 @@ The default hybrid model is selected by setting
 LOW_FREQ_SKY_MODEL = "ulsa"
 ```
 
-in `config.py`. For frequency $1\leq \nu leq 10$ MHz and sky pixel $p$, `ulsa_sky.py` uses
+in `config.py`. For frequency $1\leq \nu \leq 10$ MHz and sky pixel $p$, `ulsa_sky.py` uses
 
 $$
 \boxed{
@@ -212,7 +212,7 @@ with $T_{\rm CMB}=2.7255$ K. For $\nu\geq10$ MHz, the pipeline uses GSM2016 dire
 
 The cached ULSA maps lie on a 1-MHz grid. For noninteger frequencies between 1 and 10 MHz, `ulsa_sky.py` implements per-pixel interpolation in logarithmic temperature versus logarithmic frequency. The standard HF grid currently uses integer MHz values.
 
-### 4.4 Power-law comparison
+### 6.4 Power-law comparison
 
 The previous model extrapolated the 11-MHz GSM2016 map down to lower frequencies with a fixed power law:
 
