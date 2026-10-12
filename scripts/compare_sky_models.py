@@ -1,19 +1,39 @@
-from pathlib import Path
-
 import numpy as np
 import matplotlib.pyplot as plt
+
+from pathlib import Path
 
 
 # ============================================================
 # USER SETTINGS
 # ============================================================
 
-POWERLAW_FILE = Path("HF_sensitivity.npz")
-ULSA_FILE = Path("HF_sensitivity_ulsa.npz")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-OUTPUT_DIR = Path("plots_comparison")
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+POWERLAW_FILE = (
+    PROJECT_ROOT
+    / "results"
+    / "sensitivity"
+    / "HF_sensitivity.npz"
+)
 
+ULSA_FILE = (
+    PROJECT_ROOT
+    / "results"
+    / "sensitivity"
+    / "HF_sensitivity_ulsa.npz"
+)
+
+OUTPUT_DIR = (
+    PROJECT_ROOT
+    / "plots"
+    / "comparisons"
+)
+
+OUTPUT_DIR.mkdir(
+    parents=True,
+    exist_ok=True,
+)
 
 # ============================================================
 # LOAD AND COMPARE RESULTS

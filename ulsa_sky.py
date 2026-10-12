@@ -5,7 +5,11 @@ import healpy as hp
 import numpy as np
 
 
-ULSA_DIR = Path(__file__).resolve().parent / "ulsa_maps"
+ULSA_DIR = (
+    Path(__file__).resolve().parent
+    / "data"
+    / "ulsa_maps"
+)
 
 T_CMB = 2.7255
 GLUING_FREQ_MHZ = 10.0

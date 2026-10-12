@@ -1,123 +1,76 @@
-# ============================================================
-# Python environment and cache
-# ============================================================
-
+# Python environments and caches
 .venv/
 .venv-ulsa/
-venv/
 __pycache__/
-*.py[cod]
-.pytest_cache/
-.mypy_cache/
+*.pyc
+/cache/
 
-# ============================================================
-# Python build files
-# ============================================================
-
-build/
-dist/
-*.egg-info/
-
-# ============================================================
-# ULSA external software and dependencies
-# ============================================================
-
-external/Yanping-Cong-ULSA-80d8898/
+# External third-party software
+/external/Yanping-Cong-ULSA-80d8898/
 
 # Original downloaded ULSA archive
-
 external/*.zip
 
-# NE2001 input files in the project root
+# Generated numerical results
+/results/sensitivity/*.npz
+/results/comparisons/*.npz
 
+# Generated figures
+/plots/sensitivity/*.png
+/plots/ulsa/*.png
+/plots/comparisons/*.png
+
+# Generated sensitivity results
+/results/sensitivity/*.npz
+/*_sensitivity*.npz
+
+# Generated plots
+/plots/**/*.png
+/plots/**/*.pdf
+/plots/**/*.npz
+
+SEFD_sensitivity_range*.png
+Ae_Tsys_sensitivity_range*.png
+
+# Temporary scientific outputs
+*.hdf5
+*.h5
+*.log
+fort.*
+*.out
+
+# Compiled libraries
+*.so
+*.o
+*.a
+*.mod
+
+# Windows metadata
+*:Zone.Identifier
+
+# SPICE kernels
+/kernels/*.bsp
+/kernels/*.bc
+/kernels/*.bpc
+/kernels/*.tls
+/kernels/*.tpc
+/kernels/*.tf
+
+# Temporary ULSA files in project root
+/ulsa_*.npy
+/ulsa_*.png
+
+# Cached HEALPix coordinate vectors
+/cache/
+
+# Previous version and tests
+/v1
+/tests
+
+# NE2001 input files in the project root
 /gal01.inp
 /ne_gc.inp
 /nelism.inp
 /ne_arms_log_mod.inp
 /neclumpN.NE2001.dat
 /nevoidN.NE2001.dat
-
-# ============================================================
-# Compiled Fortran / C libraries
-# ============================================================
-
-*.so
-*.o
-*.a
-*.mod
-
-# ============================================================
-# Intermediate ULSA outputs
-# ============================================================
-
-*.hdf5
-*.h5
-*.log
-
-# ============================================================
-# NE2001 intermediate outputs
-# ============================================================
-
-*.out
-fort.*
-
-# ============================================================
-# SPICE kernels
-# ============================================================
-
-kernels/*.bsp
-kernels/*.bc
-kernels/*.bpc
-kernels/*.tls
-kernels/*.tpc
-kernels/*.tf
-
-# ============================================================
-# Generated sensitivity results
-# ============================================================
-
-*_sensitivity.npz
-*_sensitivity_ulsa.npz
-HF_model_comparison.npz
-
-# ============================================================
-# Generated plots and previous version
-# ============================================================
-
-v1/
-plots_ulsa/
-plots_comparison/
-
-SEFD_sensitivity_range*.png
-Ae_Tsys_sensitivity_range*.png
-
-ulsa_*MHz.png
-ulsa_coordinate_check.png
-
-# ============================================================
-# Temporary ULSA test files
-# ============================================================
-
-ulsa_test_*.npy
-hdf5_backup/
-
-# Temporary ULSA files in project root
-
-/ulsa_*.npy
-/ulsa_*.png
-
-# ============================================================
-# Operating system and editor files
-# ============================================================
-
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
-*.swp
-*~
-*:Zone.Identifier
-
-# Cached HEALPix coordinate vectors
-
-/cache/

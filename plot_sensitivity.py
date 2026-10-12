@@ -1,5 +1,8 @@
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parent
+PLOTS_DIR = PROJECT_ROOT / "plots" / "sensitivity"
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -273,20 +276,28 @@ def plot_all_sensitivity_ranges(
     show_plot=False,
     output_suffix="",
 ):
-    """
-    Function that creates both sensitivity plots.
-    """
+
+    PLOTS_DIR.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
     plot_sefd_ranges(
         results=results,
         bands=bands,
-        output_file=f"SEFD_sensitivity_range{output_suffix}.png",
+        output_file=(
+            PLOTS_DIR
+            / f"SEFD_sensitivity_range{output_suffix}.png"
+        ),
         show_plot=show_plot,
     )
 
     plot_ae_tsys_ranges(
         results=results,
         bands=bands,
-        output_file=f"Ae_Tsys_sensitivity_range{output_suffix}.png",
+        output_file=(
+            PLOTS_DIR
+            / f"Ae_Tsys_sensitivity_range{output_suffix}.png"
+        ),
         show_plot=show_plot,
     )

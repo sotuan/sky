@@ -41,6 +41,13 @@ from plot_sensitivity import (
 
 import spiceypy as spice
 
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent
+
+RESULTS_DIR = PROJECT_ROOT / "results" / "sensitivity"
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def make_times():
 
@@ -254,7 +261,7 @@ def main():
         # ----------------------------------------------------
 
         np.savez_compressed(
-            f"{band_name}_sensitivity{output_suffix}.npz",
+            RESULTS_DIR / f"{band_name}_sensitivity{output_suffix}.npz",
             times_utc=times,
             freqs_mhz=band.freqs_mhz,
             Tsky_K=result["Tsky_K"],

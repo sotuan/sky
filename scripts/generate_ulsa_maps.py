@@ -15,9 +15,9 @@ FREQUENCIES_MHZ = np.arange(1, 11, 1)
 
 NSIDE = 64
 
-OUTPUT_DIR = Path("ulsa_maps")
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
+OUTPUT_DIR = PROJECT_ROOT / "data" / "ulsa_maps"
 
 # ==========================================
 # GENERATE SKY MAPS
