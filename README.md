@@ -203,8 +203,8 @@ in `config.py`. For frequency $1\leq \nu \leq 10$ MHz and sky pixel $p$, `ulsa_s
 $$
 \boxed{
 T_{\rm hybrid}(\nu,p)=T_{\rm CMB}+
-\big[T_{\rm GSM}(10\,\mathrm{MHz},p)-T_{\rm CMB}\big]
-\frac{T_{\rm ULSA}(\nu,p)}{T_{\rm ULSA}(10\,\mathrm{MHz},p)}
+\big[T_{\rm GSM}(10 \mathrm{MHz},p)-T_{\rm CMB}\big]
+\frac{T_{\rm ULSA}(\nu,p)}{T_{\rm ULSA}(10 \mathrm{MHz},p)}
 }
 $$
 
@@ -217,9 +217,9 @@ The cached ULSA maps lie on a 1-MHz grid. For noninteger frequencies between 1 a
 The previous model extrapolated the 11-MHz GSM2016 map down to lower frequencies with a fixed power law:
 
 $$
-T_{\rm old}(\nu,p)=T_{\rm GSM}(11\,\mathrm{MHz},p)
-\left(\frac{\nu}{11\,\mathrm{MHz}}\right)^{-2.7},
-\qquad \nu\leq10\,\mathrm{MHz}.
+T_{\rm old}(\nu,p)=T_{\rm GSM}(11 \mathrm{MHz},p)
+\left(\frac{\nu}{11 \mathrm{MHz}}\right)^{-2.7},
+\qquad \nu\leq10 \mathrm{MHz}.
 $$
 
 This option remains available with
