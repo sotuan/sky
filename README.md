@@ -5,7 +5,7 @@ This project calculates the expected sky contribution to the LFT3 system tempera
 - effective area over system temperature, in $\text{m}^2$/K;
 - system equivalent flux density (SEFD), in Jy.
 
-The calculation uses the preliminary LFT3 beam models across HF, VHF and UHF bands, the GSM2016 sky temperature $T_{\rm GSM}$ maps obtained with PyGDSM, and the lunar reference frame imported from SPICE.
+The calculation uses the preliminary LFT3 beam models across HF, VHF and UHF bands, the GSM2016 sky temperature maps obtained with PyGDSM, the low-frequency sky maps obtained with ULSA, and the lunar reference frame imported from SPICE.
 
 ## 0. Main formulae
 
@@ -140,21 +140,93 @@ where $\alpha$ is angular separation from the formed-beam boresight, and $D$ is 
 
 ## 6. Sky model
 
-`sky_model.py` creates the GSM2016 sky model with PyGDSM.
+### 4.1 GSM2016 at 10 MHz and above
 
-The current setup uses:
+`sky_model.py` creates `pygdsm.GlobalSkyModel16` with the settings:
 
-- MHz as the frequency unit;
-- Rayleigh-Jeans temperature (`TRJ`);
-- PCHIP interpolation;
-- CMB included.
+```python
+GlobalSkyModel16(
+    freq_unit="MHz",
+    data_unit="TRJ",
+    resolution="low",
+    interpolation="pchip",
+    include_cmb=True,
+)
+```
 
-For frequencies below 11 MHz, the code extrapolates with spectral index -2.7:
+The generated map is converted to the working HEALPix `NSIDE` when necessary. Sky temperatures are in Rayleigh–Jeans Kelvin. The maps and derived sky vectors are interpreted in Galactic HEALPix RING ordering.
+
+### 4.2 ULSA maps from 1 to 10 MHz
+
+The [Ultra-long Wavelength Sky Model with Absorption (ULSA)](https://github.com/Yanping-Cong/ULSA), described by [Cong et al. (2021)](https://arxiv.org/abs/2104.03170), is used to model the low-frequency spectral and spatial effects of Galactic free–free absorption. This improves on extrapolating to lower frequencies via a single synchrotron power law.
+
+The repository contains ten precomputed raw ULSA sky-temperature maps:
+
+```text
+data/ulsa_maps/
+    ulsa_1MHz_nside64.npy
+    ulsa_2MHz_nside64.npy
+    ...
+    ulsa_10MHz_nside64.npy
+```
+
+Each `.npy` file is a one-dimensional array of $12(64)^2=49\,152$ temperatures in kelvin, with Galactic coordinates and HEALPix RING ordering. The two-column output returned by the original ULSA `mpi()` method (pixel index and temperature) was converted to this one-dimensional format when caching the maps.
+
+The maps were generated using the following ULSA parameters:
+
+```python
+absorption_JRZ(
+    v=frequency_mhz,
+    nside=64,
+    index_type="constant_index",
+    distance=50.0,             # kpc
+    using_raw_diffuse=False,
+    using_default_params=True,
+    input_spectral_index=None,
+    critical_dis=False,
+    output_absorp_free_skymap=False,
+)
+```
+
+Here `constant_index` refers to the model's intrinsic synchrotron spectral-index option. ULSA map generation requires its external code, observational input maps (including Haslam 408 MHz), and the NE2001 Galactic electron-density calculation.
+
+### 4.3 Matching ULSA to GSM2016 at 10 MHz
+
+The default hybrid model is selected by setting
+
+```python
+LOW_FREQ_SKY_MODEL = "ulsa"
+```
+
+in `config.py`. For frequency $1\leq \nu leq 10$ MHz and sky pixel $p$, `ulsa_sky.py` uses
 
 $$
-T(\nu)=T(11 \mathrm{MHz})
-\left(\frac{\nu}{11 \mathrm{MHz}}\right)^{-2.7}.
+\boxed{
+T_{\rm hybrid}(\nu,p)=T_{\rm CMB}+
+\big[T_{\rm GSM}(10\,\mathrm{MHz},p)-T_{\rm CMB}\big]
+\frac{T_{\rm ULSA}(\nu,p)}{T_{\rm ULSA}(10\,\mathrm{MHz},p)}
+}
 $$
+
+with $T_{\rm CMB}=2.7255$ K. For $\nu\geq10$ MHz, the pipeline uses GSM2016 directly.
+
+The cached ULSA maps lie on a 1-MHz grid. For noninteger frequencies between 1 and 10 MHz, `ulsa_sky.py` implements per-pixel interpolation in logarithmic temperature versus logarithmic frequency. The standard HF grid currently uses integer MHz values.
+
+### 4.4 Power-law comparison
+
+The previous model extrapolated the 11-MHz GSM2016 map down to lower frequencies with a fixed power law:
+
+$$
+T_{\rm old}(\nu,p)=T_{\rm GSM}(11\,\mathrm{MHz},p)
+\left(\frac{\nu}{11\,\mathrm{MHz}}\right)^{-2.7},
+\qquad \nu\leq10\,\mathrm{MHz}.
+$$
+
+This option remains available with
+
+```python
+LOW_FREQ_SKY_MODEL = "powerlaw"
+```
 
 ## 7. ICRS-coordinates of sky map pixels
 
@@ -207,12 +279,12 @@ For each band it:
 
 ## 10. Output files
 
-`main.py` saves one compressed NumPy file for each band:
+`main.py` saves one compressed NumPy file for each band in results/sensitivity:
 
 ```text
-HF_sensitivity.npz
-VHF_sensitivity.npz
-UHF_sensitivity.npz
+HF_sensitivity_ulsa.npz
+VHF_sensitivity_ulsa.npz
+UHF_sensitivity_ulsa.npz
 ```
 
 Each file contains:
@@ -267,30 +339,37 @@ Both axes are logarithmic.
 ## 12. Project structure
 
 ```text
-SkyT/
+sky/
 |
 |-- main.py
 |-- config.py
 |-- lft3_specs.py
 |-- sky_model.py
-|-- galactic_to_ICRF.py.py
+|-- ulsa_sky
+|-- galactic_to_ICRF.py
 |-- lunar_geometry.py
 |-- beam.py
 |-- sensitivity.py
 |-- plot_sensitivity.py
-|-- replot.py
 |
 |-- SPICE_kernels/
 |   |-- naif0012.tls
 |   |-- moon_pa_de440_200625.bpc
 |   `-- moon_de440_250416.tf
 |
-|-- cache/
-|   `-- icrs_vectors_nside*.npy
+|-- data/ulsa_maps/
+    |-- ulsa_1MHz_nside64.npy
+    |-- ulsa_2MHz_nside64.npy
+    ...
+    |-- ulsa_10MHz_nside64.npy
 |
-|-- *_sensitivity.npz
-|-- SEFD_sensitivity_range.png
-`-- Ae_Tsys_sensitivity_range.png
+|-- scripts/
+    |-- generate_ulsa_maps.py
+    |-- plot_ulsa.py
+    |-- plot_gsm_sky.py
+    |-- compare_sky_models.py
+    |-- check_hf_transition.py
+    |-- replot.py
 ```
 
 ### `config.py`
@@ -300,7 +379,10 @@ Specifies LFT3 site (lon, lat), observation times, resolution of the sky maps (N
 Frequency grids and simplified instrument parameters for the five bands.
 
 ### `sky_model.py`
-GSM2016 sky generation and HF extrapolation.
+GSM2016 + ULSA sky generation.
+
+### `ulsa_sky.py`
+Loads and interpolates cached ULSA maps.
 
 ### `galactic_to_ICRF.py`
 HEALPix sky-vector generation, Galactic-to-ICRS conversion, and caching.
@@ -334,6 +416,7 @@ The project uses:
 - Astropy
 - PyGDSM
 - SpiceyPy
+- ULSA
 
 ## 14. Modeling assumptions
 
@@ -342,7 +425,7 @@ Current assumptions include:
 1. The Moon is locally spherical (horizon masks exactly half of the sky).
 2. The lunar surface is assumed to have zero radio brightness temperature.
 3. Antenna orientations are fixed local azimuth/elevation values.
-4. GSM2016 represents the diffuse radio sky, while the sky at frequencies below 11 MHz is extrapolated from 11 MHz with spectral index -2.7.
+4. GSM2016 represents the diffuse radio sky, while the sky temperature at frequencies below 10 MHz is calculated using ULSA, with the account for free-free absorption.
 5. HF/VHF use idealized dipole patterns.
 6. UHF uses an Airy-like effective formed beam rather than a full phased-array electromagnetic model.
 7. Solar radio emission is not included.
