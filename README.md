@@ -154,7 +154,7 @@ GlobalSkyModel16(
 )
 ```
 
-The generated map is converted to the working HEALPix `NSIDE` when necessary. Sky temperatures are in Rayleigh–Jeans Kelvin. The maps and derived sky vectors are interpreted in Galactic HEALPix RING ordering.
+The generated map is converted to the working HEALPix `NSIDE` when necessary. Sky temperatures are in Rayleigh–Jeans kelvin. The maps and derived sky vectors are interpreted in Galactic HEALPix RING ordering.
 
 ### 6.2 ULSA maps from 1 to 10 MHz
 
