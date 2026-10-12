@@ -372,38 +372,9 @@ sky/
     |-- replot.py
 ```
 
-### `config.py`
-Specifies LFT3 site (lon, lat), observation times, resolution of the sky maps (NSIDE), and antenna orientations (azimuth, elevation for each band).
+**Module responsibilities:** `main.py` orchestrates the run; `config.py` holds run parameters; `lft3_specs.py` defines bands and instrument parameters; `sky_model.py` selects the GSM2016/ULSA/power-law input; `ulsa_sky.py` loads and interpolates cached ULSA maps; `galactic_to_ICRF.py` and `lunar_geometry.py` perform the sky and lunar geometry; `beam.py` specifies the simplified beam models; `sensitivity.py` calculates temperatures and sensitivity; and `plot_sensitivity.py` plots results.
 
-### `lft3_specs.py`
-Frequency grids and simplified instrument parameters for the five bands.
-
-### `sky_model.py`
-GSM2016 + ULSA sky generation.
-
-### `ulsa_sky.py`
-Loads and interpolates cached ULSA maps.
-
-### `galactic_to_ICRF.py`
-HEALPix sky-vector generation, Galactic-to-ICRS conversion, and caching.
-
-### `lunar_geometry.py`
-Local lunar coordinates and SPICE frame transformations.
-
-### `beam.py`
-HF, VHF, and UHF beam models.
-
-### `sensitivity.py`
-Calculates beam-weighted sky temperature, system temperature, effective area, $A_{\rm eff}/T_{\rm sys}$, and SEFD.
-
-### `plot_sensitivity.py`
-Plots min-max sensitivity envelopes over the full observing interval.
-
-### `main.py`
-Runs the full scientific pipeline.
-
-### `replot.py`
-Regenerates figures from saved numerical results.
+The `scripts/` folder contains standalone diagnostics, data-generation, comparison, and replotting tools. These are not imported by the main scientific pipeline.
 
 ## 13. Main dependencies
 
