@@ -396,7 +396,7 @@ Current assumptions include:
 1. The Moon is locally spherical (horizon masks exactly half of the sky).
 2. The lunar surface is assumed to have zero radio brightness temperature.
 3. Antenna orientations are fixed local azimuth/elevation values.
-4. GSM2016 represents the diffuse radio sky, while the sky temperature at frequencies below 10 MHz is calculated using ULSA, with the account for free-free absorption.
+4. GSM2016 represents the diffuse radio sky above 10 MHz, while the sky temperature at frequencies below 10 MHz is calculated using ULSA, with the account for free-free absorption.
 5. HF/VHF use idealized dipole patterns.
 6. UHF uses an Airy-like effective formed beam rather than a full phased-array electromagnetic model.
 7. Solar radio emission is not included.
