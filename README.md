@@ -136,7 +136,7 @@ $$
 x=\frac{\pi D}{\lambda}\sin\alpha,
 $$
 
-where $\alpha$ is angular separation from the formed-beam boresight, and $D$ is the directivity.
+where $\alpha$ is angular separation from the formed-beam boresight, and $D$ is the effective aperture diameter.
 
 ## 6. Sky model
 
