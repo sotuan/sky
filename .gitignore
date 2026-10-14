@@ -24,6 +24,9 @@ external/*.zip
 /results/sensitivity/*.npz
 /*_sensitivity*.npz
 
+# Keep ULSA sensitivity results
+!/results/sensitivity/*_sensitivity_ulsa.npz
+
 # Generated plots
 /plots/**/*.png
 /plots/**/*.pdf
