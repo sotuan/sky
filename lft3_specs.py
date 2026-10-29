@@ -3,26 +3,23 @@ import numpy as np
 
 
 @dataclass
-class Band:
+class Antenna:
 
     name: str
     freqs_mhz: np.ndarray
 
     n_elements: int
-    directivity: float
-    trcvr_k: float
-
-    beam_type: str
+    #directivity: float
+    #trcvr_k: float
 
     aperture_diameter_m: float | None = None
-    airy_lambda_scale: float | None = None
 
 
-def make_bands():
+def get_antenna_specs():
 
     return {
 
-        "HF": Band(
+        "HF": Antenna(
             name="HF",
 
             # 1-50 MHz, 1 MHz spacing
@@ -31,12 +28,12 @@ def make_bands():
             ),
 
             n_elements=1,
-            directivity=1.6,
-            trcvr_k=300.0,
-            beam_type="hf_dipole",
+            #directivity=1.6,
+            #trcvr_k=300.0,
+            #beam_type="hf_dipole",
         ),
 
-        "VHF": Band(
+        "VHF": Antenna(
             name="VHF",
 
             # 60-250 MHz, 1 MHz spacing
@@ -45,12 +42,12 @@ def make_bands():
             ),
 
             n_elements=1,
-            directivity=1.6,
-            trcvr_k=100.0,
-            beam_type="half_wave_dipole",
+            #directivity=1.6,
+            #trcvr_k=100.0,
+            #beam_type="half_wave_dipole",
         ),
 
-        "UHF": Band(
+        "UHF": Antenna(
             name="UHF",
 
             # 300-2700 MHz, 2 MHz
@@ -59,10 +56,9 @@ def make_bands():
             ),
 
             n_elements=48,
-            directivity=3.1,
-            trcvr_k=30.0,
-            beam_type="airy",
+            #directivity=3.1,
+            #trcvr_k=30.0,
+            #beam_type="airy",
             aperture_diameter_m=3.5,
-            airy_lambda_scale=300.0,
         ),
     }
