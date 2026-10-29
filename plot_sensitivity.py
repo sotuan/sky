@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 def plot_sefd_ranges(
     results,
-    bands,
+    antennas,
     output_file,
     show_plot=False,
 ):
@@ -29,11 +29,11 @@ def plot_sefd_ranges(
         figsize=(10, 6)
     )
 
-    for band_name, band in bands.items():
+    for antenna_name, antenna in antennas.items():
 
-        result = results[band_name]
+        result = results[antenna_name]
 
-        frequencies = band.freqs_mhz
+        frequencies = antenna.freqs_mhz
 
         sefd = np.asarray(
             result["SEFD_Jy"],
@@ -62,7 +62,7 @@ def plot_sefd_ranges(
             sefd_min,
             sefd_max,
             alpha=0.25,
-            label=f"{band_name}",
+            label=f"{antenna_name}",
         )
 
         # Use same automatically chosen colour
@@ -141,7 +141,7 @@ def plot_sefd_ranges(
 
 def plot_ae_tsys_ranges(
     results,
-    bands,
+    antennas,
     output_file,
     show_plot=False,
 ):
@@ -160,11 +160,11 @@ def plot_ae_tsys_ranges(
         figsize=(10, 6)
     )
 
-    for band_name, band in bands.items():
+    for antenna_name, antenna in antennas.items():
 
-        result = results[band_name]
+        result = results[antenna_name]
 
-        frequencies = band.freqs_mhz
+        frequencies = antenna.freqs_mhz
 
         ae_tsys = np.asarray(
             result["Ae_Tsys_m2_per_K"],
@@ -193,7 +193,7 @@ def plot_ae_tsys_ranges(
             ae_tsys_min,
             ae_tsys_max,
             alpha=0.25,
-            label=f"{band_name}",
+            label=f"{antenna_name}",
         )
 
         colour = region.get_facecolor()[0]
@@ -272,7 +272,7 @@ def plot_ae_tsys_ranges(
 
 def plot_all_sensitivity_ranges(
     results,
-    bands,
+    antennas,
     show_plot=False,
     output_suffix="",
 ):
@@ -284,7 +284,7 @@ def plot_all_sensitivity_ranges(
 
     plot_sefd_ranges(
         results=results,
-        bands=bands,
+        antennas=antennas,
         output_file=(
             PLOTS_DIR
             / f"SEFD_sensitivity_range{output_suffix}.png"
@@ -294,7 +294,7 @@ def plot_all_sensitivity_ranges(
 
     plot_ae_tsys_ranges(
         results=results,
-        bands=bands,
+        antennas=antennas,
         output_file=(
             PLOTS_DIR
             / f"Ae_Tsys_sensitivity_range{output_suffix}.png"

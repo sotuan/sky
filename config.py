@@ -36,13 +36,39 @@ WORK_NSIDE = 64
 LOW_FREQ_SKY_MODEL = "ulsa"
 
 # ============================================================
+# Active antennas
+# ============================================================
+
+ACTIVE_ANTENNAS = ["UHF"]
+
+# ============================================================
+# Beam models (see beam_registry.py)
+# ============================================================
+
+BEAM_MODELS = {
+    "HF": "analytic",
+    "VHF": "analytic",
+    "UHF": "analytic",
+}
+
+# ============================================================
+# Experiment orientation relative to local lunar NEZ
+# ============================================================
+
+EXPERIMENT_ORIENTATION = {
+    "alpha_deg": 0.0,
+    "beta_deg": 0.0,
+    "gamma_deg": 0.0,
+}
+
+# ============================================================
 # Antenna orientations
 #
 # Convention:
-#   az =   0 deg -> local north
-#   az =  90 deg -> local east
-#   el =   0 deg -> local horizon
-#   el =  90 deg -> local zenith
+#   az =   0 deg -> experiment X axis
+#   az =  90 deg -> experiment Y axis
+#   el =   0 deg -> experiment XY plane
+#   el =  90 deg -> experiment Z axis (direction toward the top)
 #
 # HF/VHF:
 #   orientation describes the dipole axis.

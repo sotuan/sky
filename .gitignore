@@ -67,6 +67,10 @@ fort.*
 /cache/
 
 # Previous version and tests
+/backups/
+/beam.py
+/lft3_specs.py
+/lunar_geometry.py
 /v1
 /tests
 

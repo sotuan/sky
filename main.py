@@ -6,11 +6,16 @@ from config import (
     STOP_DATE,
     TIME_STEP_DAYS,
     WORK_NSIDE,
+    ACTIVE_ANTENNAS,
+    BEAM_MODELS,
+    EXPERIMENT_ORIENTATION,
     ANTENNA_ORIENTATIONS,
     LOW_FREQ_SKY_MODEL,
 )
 
-from lft3_specs import make_bands
+from beam_registry import load_beam_model
+
+from lft3_specs1 import get_antenna_specs
 
 from sky_model import (
     generate_sky_map,
@@ -24,11 +29,12 @@ from galactic_to_ICRF import (
     get_icrs_pixel_vectors,
 )
 
-from lunar_geometry import (
+from lunar_geometry1 import (
     load_spice_kernels,
     make_rotation_matrices,
-    make_antenna_directions,
     make_zenith_directions,
+    make_nez_axes,
+    get_orientation,
 )
 
 from sensitivity import (
@@ -115,11 +121,17 @@ def main():
             times
         )
     )
+    
+    nez_axes_icrs = make_nez_axes(
+        rotations
+    )
+    
+    old_zenith = make_zenith_directions(rotations)
 
-    zenith_j2000 = (
-        make_zenith_directions(
-            rotations
-        )
+    assert np.allclose(
+        nez_axes_icrs[:, :, 2],
+        old_zenith,
+        atol=1e-12,
     )
 
 
@@ -135,7 +147,28 @@ def main():
 
 
     # ========================================================
-    # 4. PyGDSM
+    # 4. LFT3 antennas specifications
+    # ========================================================
+
+    all_antennas = get_antenna_specs()
+
+    antennas = {
+        name: all_antennas[name]
+        for name in ACTIVE_ANTENNAS
+    }
+
+    # Restrict UHF frequencies for testing
+    antennas["UHF"].freqs_mhz = np.arange(
+        300.0,
+        500.0 + 0.1,
+        2.0,
+    )
+
+    results = {}
+    
+
+    # ========================================================
+    # 5. PyGDSM
     # ========================================================
 
     gsm = create_gsm()
@@ -162,60 +195,47 @@ def main():
         raise ValueError(
             f"Unknown sky model: {LOW_FREQ_SKY_MODEL}"
         )
-
+        
 
     # ========================================================
-    # 5. LFT3 bands
+    # 6. Calculate sensitivity for each antenna
     # ========================================================
 
-    bands = make_bands()
+    for antenna_name, antenna in antennas.items():
 
-    results = {}
+        selected_beam_model = BEAM_MODELS[antenna_name]
+        
+        # Identify the sky model and beam model in output filenames
     
-    # Identify the sky model in output filenames
-    output_suffix = (
-       "_ulsa"
-       if LOW_FREQ_SKY_MODEL == "ulsa"
-       else ""
-    )
-
-
-    # ========================================================
-    # 6. Each band
-    # ========================================================
-
-    for band_name, band in bands.items():
-
-        print()
-        print("========================")
-        print(band_name)
-        print("========================")
-
-        orientation = (
-            ANTENNA_ORIENTATIONS[
-                band_name
-            ]
+        output_suffix = (
+            f"_{LOW_FREQ_SKY_MODEL}"
+            f"_{selected_beam_model}"
+            f"_300-500MHz"
+        )
+        
+        beam_config = load_beam_model(
+            antenna_name,
+            selected_beam_model,
         )
 
-        # ----------------------------------------------------
-        # Antenna/formed-beam direction
-        # ----------------------------------------------------
-
-        antenna_j2000 = (
-            make_antenna_directions(
-                orientation["az_deg"],
-                orientation["el_deg"],
-                rotations,
-            )
+        print(
+            f"{antenna_name}: "
+            f"using beam model '{selected_beam_model}'"
         )
-
+    
+        # Experiment orientation relative to local lunar NEZ
+        
+        orientation = get_orientation(
+            **EXPERIMENT_ORIENTATION
+        )
+        
         # ----------------------------------------------------
         # Generate GSM maps at every frequency
         # ----------------------------------------------------
 
         sky_maps = []
 
-        for freq in band.freqs_mhz:
+        for freq in antenna.freqs_mhz:
 
             print(
                 f"Generating sky: "
@@ -238,32 +258,37 @@ def main():
         # ----------------------------------------------------
 
         print(
-            f"Finished generating {band_name} sky maps."
+            f"Finished generating {antenna_name} sky maps."
         )
 
         print(
-            f"Starting {band_name} sensitivity calculation..."
+            f"Starting {antenna_name} sensitivity calculation..."
         )
-
+        
         result = calculate_sensitivity(
-            band=band,
-            frequencies_mhz=band.freqs_mhz,
+            antenna=antenna,
+            antenna_name=antenna_name,
+            frequencies_mhz=antenna.freqs_mhz,
             sky_maps=sky_maps,
             sky_vectors_icrs=sky_vectors_icrs,
-            antenna_j2000=antenna_j2000,
-            zenith_j2000=zenith_j2000,
+            nez_axes_icrs=nez_axes_icrs,
+            orientation=orientation,
+            beam_config=beam_config,
         )
-
-        results[band_name] = result
+        
+        results[antenna_name] = result
 
         # ----------------------------------------------------
         # Save results
         # ----------------------------------------------------
 
         np.savez_compressed(
-            RESULTS_DIR / f"{band_name}_sensitivity{output_suffix}.npz",
+            RESULTS_DIR / f"{antenna_name}_sensitivity{output_suffix}.npz",
             times_utc=times,
-            freqs_mhz=band.freqs_mhz,
+            freqs_mhz=antenna.freqs_mhz,
+            sky_model=LOW_FREQ_SKY_MODEL,
+            beam_model=selected_beam_model,
+            Trcvr_K=result["Trcvr_K"],
             Tsky_K=result["Tsky_K"],
             Tsys_K=result["Tsys_K"],
             Aeff_m2=result["Aeff_m2"],
@@ -274,7 +299,7 @@ def main():
 
         print()
         print(
-            f"{band_name}: saved."
+            f"{antenna_name}: saved."
         )
     
     
@@ -282,11 +307,13 @@ def main():
     # 7. Generate sensitivity plots
     # ========================================================
 
+    plot_suffix = f"_{LOW_FREQ_SKY_MODEL}"
+
     plot_all_sensitivity_ranges(
         results=results,
-        bands=bands,
+        antennas=antennas,
         show_plot=False,
-        output_suffix=output_suffix,
+        output_suffix=plot_suffix,
     )
 
 
