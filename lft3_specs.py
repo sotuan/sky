@@ -9,8 +9,6 @@ class Antenna:
     freqs_mhz: np.ndarray
 
     n_elements: int
-    #directivity: float
-    #trcvr_k: float
 
     aperture_diameter_m: float | None = None
 
@@ -28,9 +26,6 @@ def get_antenna_specs():
             ),
 
             n_elements=1,
-            #directivity=1.6,
-            #trcvr_k=300.0,
-            #beam_type="hf_dipole",
         ),
 
         "VHF": Antenna(
@@ -42,23 +37,17 @@ def get_antenna_specs():
             ),
 
             n_elements=1,
-            #directivity=1.6,
-            #trcvr_k=100.0,
-            #beam_type="half_wave_dipole",
         ),
 
         "UHF": Antenna(
             name="UHF",
 
-            # 300-2700 MHz, 2 MHz
+            # 300-2700 MHz, 2 MHz spacing
             freqs_mhz=np.arange(
                 300.0, 2700.0 + 0.1, 2.0
             ),
 
             n_elements=48,
-            #directivity=3.1,
-            #trcvr_k=30.0,
-            #beam_type="airy",
             aperture_diameter_m=3.5,
         ),
     }

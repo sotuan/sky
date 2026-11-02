@@ -15,7 +15,7 @@ from config import (
 
 from beam_registry import load_beam_model
 
-from lft3_specs1 import get_antenna_specs
+from lft3_specs import get_antenna_specs
 
 from sky_model import (
     generate_sky_map,
@@ -29,7 +29,7 @@ from galactic_to_ICRF import (
     get_icrs_pixel_vectors,
 )
 
-from lunar_geometry1 import (
+from lunar_geometry import (
     load_spice_kernels,
     make_rotation_matrices,
     make_zenith_directions,

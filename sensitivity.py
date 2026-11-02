@@ -1,13 +1,13 @@
 import numpy as np
 
-from beam1 import (
+from beam import (
     analytic_directivity,
     beam_directivity,
     hf_backlobe_factor,
     get_beam,
 )
 
-from lft3_specs1 import Antenna
+from lft3_specs import Antenna
 from config import (
     K_B,
     ANTENNA_ORIENTATIONS,

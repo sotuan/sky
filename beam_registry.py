@@ -1,5 +1,5 @@
 from pathlib import Path
-from beam1 import NumericalBeam
+from beam import NumericalBeam
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
