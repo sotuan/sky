@@ -39,7 +39,7 @@ LOW_FREQ_SKY_MODEL = "ulsa"
 # Active antennas
 # ============================================================
 
-ACTIVE_ANTENNAS = ["UHF"]
+ACTIVE_ANTENNAS = ["HF","VHF","UHF"]
 
 # ============================================================
 # Beam models (see beam_registry.py)
